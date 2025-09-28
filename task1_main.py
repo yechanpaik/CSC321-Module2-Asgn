@@ -7,8 +7,11 @@ KEY_LEN_PLACEHOLDER = int(128/8)
 #Task 1
 #part 1: program takes in a plaintext file (.txt)
 plaintext_blocks = []
-filename = input("Enter the file name: ")
+filename = input("Enter the bmp name: ")
+header: bytearray = None
 with open(filename, 'rb') as file:
+    header = file.read(54)
+    # header
     contents = file.read(16)
     while(contents):
         if(len(contents) < 16): 
@@ -41,8 +44,14 @@ for blocks in plaintext_blocks:
     ciphertext_blocks_ecb.append(encrypted_block_ecb)
     
 ciphertext_ecb = b''.join(ciphertext_blocks_ecb) #use the array to build a ciphertext string
+ciphertext_ecb = b''.join()
 
 print(f"final ciphertext_ecb: \n{ciphertext_ecb}\n")
+#build a new file with the ciphertext
+with open("encrypted_ecb_" + filename, 'wb') as file:
+    file.write(header)
+    file.write(ciphertext_ecb)
+    
 # endregion ECB
 
 # region BEGIN CBC 
@@ -70,18 +79,9 @@ for blocks in plaintext_blocks:
 ciphertext_cbc = b''.join(ciphertext_blocks_cbc)
 
 print(f"final ciphertext_cbc: \n{ciphertext_cbc}\n")
+#build a new file with the ciphertext
+with open("encrypted_cbc_" + filename, 'wb') as file:
+    file.write(header)
+    file.write(ciphertext_ecb)
+    
 # endregion END CBC
-
-# --- Task 2
-
-# region BEGIN SUBMIT()
-original_string = input("Enter a string: ")
-
-prepended_string = "userid=456; userdata=" + original_string
-
-appended_string = prepended_string + ";session-id=31337"
-
-url_encoded_string_first_half = appended_string.replace("=", "%3D")
-url_encoded_string = url_encoded_string_first_half.replace(";", "%3B")
-
-padded_string = pad(url_encoded_string.encode('utf-8'), 16)
