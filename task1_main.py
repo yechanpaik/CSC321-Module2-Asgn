@@ -1,6 +1,7 @@
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad
+from Crypto.Util.strxor import strxor
 
 KEY_LEN_PLACEHOLDER = int(128/8)
 #Task 1
@@ -44,48 +45,36 @@ ciphertext_ecb = b''.join(ciphertext_blocks_ecb) #use the array to build a ciphe
 print(f"final ciphertext_ecb: \n{ciphertext_ecb}\n")
 # endregion ECB
 
-# --- BEGIN CBC 
+# region BEGIN CBC 
 cipher_cbc = AES.new(key, AES.MODE_CBC)
 
 ciphertext_blocks_cbc = []
+# for blocks in plaintext_blocks:
+#     encrypted_block_cbc = cipher_cbc.encrypt(blocks)
+#     ciphertext_blocks_cbc.append(encrypted_block_cbc)
+
+# ciphertext_cbc = b''.join(ciphertext_blocks_cbc)
+    
+cbc_iv = get_random_bytes(KEY_LEN_PLACEHOLDER)
+i = 0
 for blocks in plaintext_blocks:
-    encrypted_block_cbc = cipher_cbc.encrypt(blocks)
-    ciphertext_blocks_cbc.append(encrypted_block_cbc)
+  if(i==0):
+      one_before = blocks
+      encrypted_block_cbc = cipher_cbc.encrypt(strxor(blocks, cbc_iv))
+      i = 1
+  else:
+      encrypted_block_cbc  = cipher_cbc.encrypt(strxor(blocks, one_before))
+      one_before = blocks
+  ciphertext_blocks_cbc.append(encrypted_block_cbc)
 
 ciphertext_cbc = b''.join(ciphertext_blocks_cbc)
-    
 
 print(f"final ciphertext_cbc: \n{ciphertext_cbc}\n")
-
-#cbc_iv = get_random_bytes(KEY_LEN_PLACEHOLDER)
-#i = 0
-# for blocks in plaintext_blocks:
-#   if(i==0):
-#       one_before = blocks
-#       encrypted_block_cbc = cipher_cbc.encrypt(blocks XOR iv)
-#       i = 1
-#   else:
-#       encrypted_block_cbc  = cipher_cbc.encrypt(blocks XOR one_before)
-#       one_before = blocks
-#   ciphertext_blocks_cbc.append(encrypted_block_cbc)
-
-#ciphertext_cbc = b''.join(ciphertext_blocks_cbc)
-
-#print(f"final ciphertext_cbc: \n{ciphertext_cbc}\n")
-# --- END CBC
-
-
-# final ciphertext_ecb:
-# b'\x93Ze\x1cQ6\x93}\x13BB\x9d\x85\x88Zu\x80,z\xcf\x95\x04&i\xb3t\x95\x1c\xe2\xeb\xff\x95\x8b\xb3\xdd\x8bd\xfa\x83\xfd)\xdccC\x08\xaboX\xe5\xcd\xb5\x9cY\x11\xd8\x16\x88\xf8h\xaf\xda\xee\x9a\x8fv\x05\xc3\xf4\xe8\xbf\xa5\x9bJR\xca\xd8\x8f\xa8\xea\xc6j\xeb`\x90\xf0\x82\x7f*)\xed\xc2\x19Y\xaa|C'
-
-# final ciphertext_cbc: 
-# b'\x978\x0f;\xa2%\xfd\x1dC\xab\xa4\x9fp\xe1\\x\x1e\xeduoQ\x06,\xf9\x96\x97\x9e9\xa5\xab\xcd\xc1\x15$\xcf\x82f\x82C\x80f\xdbK\x88U\xd8\xd4\x04\xb8\xa4\x170\xaeRS\x83nh\x81\xfb\xfb\xcc\x0f\xc5\x00\x83\x07,\xd8\x82\x08\xa0\xfb\tC\x89\xc8W\xe04\xe7\x96\xebN\xee\x81O\xb7f\x8c\xb8\xccoO\x11\xf4'
-
-
+# endregion END CBC
 
 # --- Task 2
 
-# --- BEGIN SUBMIT()
+# region BEGIN SUBMIT()
 original_string = input("Enter a string: ")
 
 prepended_string = "userid=456; userdata=" + original_string
