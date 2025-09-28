@@ -13,3 +13,7 @@ url_encoded_string = url_encoded_string_first_half.replace(";", "%3B")
 padded_string = pad(url_encoded_string.encode('utf-8'), 16)
 
 # endregion SUBMIT()
+
+#region BEGIN VERIFY()
+
+#endregion VERIFY()

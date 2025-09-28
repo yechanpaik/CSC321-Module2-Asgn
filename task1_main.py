@@ -28,7 +28,6 @@ with open(filename, 'rb') as file:
 print(f"parsed array of plaintext_blocks: \n{plaintext_blocks}\n")
 
 # region BEGIN ECB
-#part 2: generate a random key 
 key = get_random_bytes(KEY_LEN_PLACEHOLDER)
 
 #a Cipher is a sequence of operations that will convert plaintext into ciphertext, 
@@ -36,18 +35,14 @@ key = get_random_bytes(KEY_LEN_PLACEHOLDER)
 #AES.new() generates a cipher
 cipher_ecb = AES.new(key, AES.MODE_ECB)
 
-#part 3: use the key to encrypt the plaintext file and make a new file
-
 ciphertext_blocks_ecb = []
 for blocks in plaintext_blocks:
     encrypted_block_ecb = cipher_ecb.encrypt(blocks)
     ciphertext_blocks_ecb.append(encrypted_block_ecb)
     
 ciphertext_ecb = b''.join(ciphertext_blocks_ecb) #use the array to build a ciphertext string
-ciphertext_ecb = b''.join()
 
 print(f"final ciphertext_ecb: \n{ciphertext_ecb}\n")
-#build a new file with the ciphertext
 with open("encrypted_ecb_" + filename, 'wb') as file:
     file.write(header)
     file.write(ciphertext_ecb)
@@ -58,11 +53,6 @@ with open("encrypted_ecb_" + filename, 'wb') as file:
 cipher_cbc = AES.new(key, AES.MODE_CBC)
 
 ciphertext_blocks_cbc = []
-# for blocks in plaintext_blocks:
-#     encrypted_block_cbc = cipher_cbc.encrypt(blocks)
-#     ciphertext_blocks_cbc.append(encrypted_block_cbc)
-
-# ciphertext_cbc = b''.join(ciphertext_blocks_cbc)
     
 cbc_iv = get_random_bytes(KEY_LEN_PLACEHOLDER)
 i = 0
@@ -79,9 +69,8 @@ for blocks in plaintext_blocks:
 ciphertext_cbc = b''.join(ciphertext_blocks_cbc)
 
 print(f"final ciphertext_cbc: \n{ciphertext_cbc}\n")
-#build a new file with the ciphertext
 with open("encrypted_cbc_" + filename, 'wb') as file:
     file.write(header)
-    file.write(ciphertext_ecb)
+    file.write(ciphertext_cbc)
     
 # endregion END CBC
