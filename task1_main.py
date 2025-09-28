@@ -21,32 +21,44 @@ def encrypt_with_ecb(key: bytes, plaintext_blocks: list[bytes]):
         
     ciphertext_ecb = b''.join(ciphertext_blocks_ecb) #use the array to build a ciphertext string
 
-    print(f"encrypted ciphertext (ECB): \n{ciphertext_ecb}\n")
+    print(f"Encrypted ciphertext (ECB): \n{ciphertext_ecb}\n")
     return ciphertext_ecb
     
-def encrypt_with_cbc(iv: bytes, plaintext_blocks: list[bytes]): 
+def encrypt_with_cbc(key, iv: bytes, plaintext_blocks: list[bytes]): 
     #key: a 128bit random byte that acts as the key
     #plaintext_blocks: an array of plaintext 16 bytes ea
     #RETURNS complete ciphertext
     
-    cipher_cbc = AES.new(iv, AES.MODE_CBC)
+    cipher_cbc = AES.new(key, AES.MODE_ECB)
 
     ciphertext_blocks_cbc = []
+     
+    #Process for cbc encryption:
+    # First block:
+        # XOR the first plaintext block with the IV.
+        # Encrypt the result to get the first ciphertext block.
+    # Subsequent blocks:
+        # XOR the plaintext block with the previous ciphertext block.
+        # Encrypt the result with a cipher to get the next ciphertext block.
         
+    #!Note: Cipher can be ECB or CBC it doesn't matter since its only for one block
+    #What makes it CBC Encryption is the XOR masks between each block encryption
+    # see discord pic 
+    
     i = 0
     for blocks in plaintext_blocks:
         if (i==0):
-            one_before = blocks
             encrypted_block_cbc = cipher_cbc.encrypt(strxor(blocks, iv))
+            prev_block = encrypted_block_cbc
             i = 1
         else:
-            encrypted_block_cbc  = cipher_cbc.encrypt(strxor(blocks, one_before))
-            one_before = blocks
+            encrypted_block_cbc  = cipher_cbc.encrypt(strxor(blocks, prev_block))
+            prev_block = encrypted_block_cbc
         ciphertext_blocks_cbc.append(encrypted_block_cbc)
 
     ciphertext_cbc = b''.join(ciphertext_blocks_cbc)
 
-    print(f"encrypted ciphertext (CBC): \n{ciphertext_cbc}\n")
+    print(f"Encrypted ciphertext (CBC): \n{ciphertext_cbc}\n")
     return ciphertext_cbc
 
 def main():
@@ -81,7 +93,7 @@ def main():
         file.write(ciphertext_ecb)
         
     cbc_iv = get_random_bytes(KEY_LEN_PLACEHOLDER)
-    ciphertext_cbc = encrypt_with_cbc(cbc_iv, plaintext_blocks)
+    ciphertext_cbc = encrypt_with_cbc(key, cbc_iv, plaintext_blocks)
     with open("encrypted_cbc_" + filename, 'wb') as file:
         file.write(header)
         file.write(ciphertext_cbc)
